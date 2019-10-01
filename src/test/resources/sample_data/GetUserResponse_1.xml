@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<ns0:GetUserResponse xmlns:ns0="http://www.craftsoftware.com/users">
+  <ns0:User>
+    <ns0:id>1</ns0:id>
+    <ns0:fist>????</ns0:fist>
+    <ns0:last>????</ns0:last>
+    <ns0:department>????</ns0:department>
+  </ns0:User>
+</ns0:GetUserResponse>
