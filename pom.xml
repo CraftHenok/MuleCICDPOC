@@ -289,16 +289,10 @@
 		<repository>
             <id>central</id>
             <name>Craft Releases Repository</name>
-            <url>https://craftart1.jfrog.io/craftart1/Jenkins-integration/</url>
+            <url>https://craftart1.jfrog.io/craftart1/libs-release/</url>
             <layout>default</layout>
 		</repository>
-		     
-		<repository>
-            <id>local</id>
-            <name>Craft Releases Repository</name>
-            <url>https://craftart1.jfrog.io/craftart1/Jenkins-integration/</url>
-            <layout>default</layout>
-		</repository>
+ 
     </repositories>
     <pluginRepositories>
         <pluginRepository>
