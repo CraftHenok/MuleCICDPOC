@@ -114,6 +114,15 @@
         </testResources>
     </build>
 <profiles>
+		<profile>
+				<repositories>
+				  <repository>
+					  <id>central</id>
+					  <name>maven-example</name>
+					  <url>https://craftart1.jfrog.io/craftart1/libs-release/</url>
+				  </repository>
+				</repositories>
+			  </profile>
 	<profile>
 		<id>dev</id>
 		<build>
