@@ -294,7 +294,7 @@
 		</repository>
 		     
 		<repository>
-            <id>central</id>
+            <id>local</id>
             <name>Craft Releases Repository</name>
             <url>https://craftart1.jfrog.io/craftart1/libs-release-local/</url>
             <layout>default</layout>
