@@ -5,7 +5,7 @@
 	<groupId>com.mycompany</groupId>
 	<artifactId>capstoneRESTService</artifactId>
 	<version>1.0.0-SNAPSHOT</version> 
-	<packaging>jar</packaging>
+	<packaging>mule</packaging>
 	<name>Mule capstoneRESTService Application</name>
 
     <properties>
