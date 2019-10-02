@@ -303,13 +303,13 @@
 		</repository>
  
     </repositories>
-    <pluginRepositories>
+     <pluginRepositories>
         <pluginRepository>
-			<id>central</id>
-            <name>Craft Releases Repository</name>
-            <url>https://craftart1.jfrog.io/craftart1/libs-release/</url>
+            <id>mulesoft-release</id>
+            <name>mulesoft release repository</name>
             <layout>default</layout>
-			<snapshots>
+            <url>http://repository.mulesoft.org/releases/</url>
+            <snapshots>
                 <enabled>false</enabled>
             </snapshots>
         </pluginRepository>
