@@ -154,7 +154,7 @@
 							<username>${anypoint.username}</username>
 							<password>${anypoint.password}</password>
 							<workerType>Micro</workerType>
-							<applicationName>craft-cicd-usermgt</applicationName>
+							<applicationName>craft-cicd-usermgt-dev</applicationName>
 							<environment>Sandbox</environment>
 							<properties>
 								<https.port>1443</https.port>
