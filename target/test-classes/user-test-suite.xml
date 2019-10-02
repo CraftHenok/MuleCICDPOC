@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:munit="http://www.mulesoft.org/schema/mule/munit" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:core="http://www.mulesoft.org/schema/mule/core" xmlns:mock="http://www.mulesoft.org/schema/mule/mock" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/munit http://www.mulesoft.org/schema/mule/munit/current/mule-munit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/mock http://www.mulesoft.org/schema/mule/mock/current/mule-mock.xsd">
+    <munit:config mock-connectors="false" mock-inbounds="false" name="munit" doc:name="MUnit configuration"/>
+    <spring:beans>
+        <spring:import resource="classpath:user.xml"/>
+    </spring:beans>
+    <munit:test name="user-test-suite-put:/users:user-configTest" description="Test">
+        <mock:when messageProcessor=".*:.*" doc:name="Mock">
+            <mock:with-attributes>
+                <mock:with-attribute name="doc:name" whereValue="#['Web Service Consumer']"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[getResource('sample_data/updateuserRequest.xml').asString()]" mimeType="application/xml"/>
+        </mock:when>
+        <munit:set payload="#['{&quot;id&quot;:2,&quot;first&quot;: &quot;henok&quot;,&quot;last&quot;: &quot;mehari&quot;,&quot;department&quot;: &quot;dep&quot;}']" mimeType="application/json" doc:name="Set Message"/>
+        <flow-ref name="put:/users:user-config" doc:name="Flow-ref to put:/users:user-config"/>
+        <munit:assert-on-equals message="wrong payload" expectedValue="successfully updated" actualValue="#[payload]" doc:name="Assert Equals"/>
+    </munit:test>
+    <munit:test name="user-test-suite-delete:/users/{id}:user-configTest" description="Test">
+        <mock:when messageProcessor=".*:.*" doc:name="Mock">
+            <mock:with-attributes>
+                <mock:with-attribute name="doc:name" whereValue="#['Web Service Consumer']"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[getResource('sample_data/updateuserRequest.xml').asString()]" mimeType="application/xml"/>
+        </mock:when>
+        <munit:set payload="#[]" doc:name="Set Message">
+            <munit:inbound-properties>
+                <munit:inbound-property key="http.uri.params" value="#[['id':'2']]"/>
+            </munit:inbound-properties>
+        </munit:set>
+        <flow-ref name="delete:/users/{id}:user-config" doc:name="Flow-ref to delete:/users/{id}:user-config"/>
+        <munit:assert-on-equals message="filed to delete" expectedValue="successfully deleted" actualValue="#[payload]" doc:name="Assert Equals"/>
+    </munit:test>
+    <munit:test name="user-test-suite-get:/users:user-configTest" description="Test">
+        <mock:when messageProcessor=".*:.*" doc:name="Mock">
+            <mock:with-attributes>
+                <mock:with-attribute name="doc:name" whereValue="#['Web Service Consumer']"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[getResource('sample_data/GetAllUsersResponse.xml').asString()]" mimeType="application/xml"/>
+        </mock:when>
+        <flow-ref name="get:/users:user-config" doc:name="Flow-ref to get:/users:user-config"/>
+        <munit:assert-on-equals message="wrong payload" expectedValue="#[payload]" actualValue="#[payload]" doc:name="Assert Equals"/>
+    </munit:test>
+    <munit:test name="user-test-suite-get:/users/{id}:user-configTest" description="Test">
+        <mock:when messageProcessor=".*:.*" doc:name="Mock">
+            <mock:with-attributes>
+                <mock:with-attribute name="doc:name" whereValue="#['Web Service Consumer']"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[getResource('sample_data/GetUserResponse.xml').asString()]" mimeType="application/xml"/>
+        </mock:when>
+        <munit:set payload="#[]" doc:name="Set Message">
+            <munit:inbound-properties>
+                <munit:inbound-property key="http.uri.params" value="#[['id':'2']]"/>
+            </munit:inbound-properties>
+        </munit:set>
+        <flow-ref name="get:/users/{id}:user-config" doc:name="Flow-ref to get:/users/{id}:user-config"/>
+        <munit:assert-on-equals expectedValue="#[payload]" actualValue="#[payload]" doc:name="Assert Equals"/>
+    </munit:test>
+    <munit:test name="user-test-suite-post:/users:user-configTest" description="Test">
+        <mock:when messageProcessor=".*:.*" doc:name="Mock">
+            <mock:with-attributes>
+                <mock:with-attribute name="doc:name" whereValue="#['Web Service Consumer']"/>
+            </mock:with-attributes>
+            <mock:then-return payload="#[getResource('sample_data/GetAllUsersResponse.xml').asString()]" mimeType="application/xml"/>
+        </mock:when>
+        <munit:set payload="#['{&quot;first&quot;: &quot;henok&quot;,&quot;last&quot;: &quot;mehari&quot;,&quot;department&quot;: &quot;dep&quot;}']" mimeType="application/json" doc:name="Set Message"/>
+        <flow-ref name="post:/users:user-config" doc:name="Flow-ref to post:/users:user-config"/>
+        <munit:assert-on-equals expectedValue="successfully saved" actualValue="#[payload]" doc:name="Assert Equals"/>
+    </munit:test>
+</mule>

@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mule xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:apikit="http://www.mulesoft.org/schema/mule/apikit" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:dw="http://www.mulesoft.org/schema/mule/ee/dw" xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns:metadata="http://www.mulesoft.org/schema/mule/metadata" xmlns:spring="http://www.springframework.org/schema/beans" xmlns:ws="http://www.mulesoft.org/schema/mule/ws" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/apikit http://www.mulesoft.org/schema/mule/apikit/current/mule-apikit.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+http://www.mulesoft.org/schema/mule/ws http://www.mulesoft.org/schema/mule/ws/current/mule-ws.xsd
+http://www.mulesoft.org/schema/mule/ee/dw http://www.mulesoft.org/schema/mule/ee/dw/current/dw.xsd">
+    <http:listener-config name="user-httpListenerConfig" host="0.0.0.0" port="8089" doc:name="HTTP Listener Configuration" />
+    <apikit:config name="user-config" raml="user.raml" consoleEnabled="false" doc:name="Router" keepRamlBaseUri="false" />
+    <ws:consumer-config name="Web_Service_Consumer" wsdlLocation="http://dev.icraftsoft.net:5858/ws/users.wsdl" service="UserPortService" port="UserPortSoap11" serviceAddress="http://dev.icraftsoft.net:5858/ws" doc:name="Web Service Consumer" />
+    <flow name="user-main">
+        <http:listener config-ref="user-httpListenerConfig" path="/api/*" doc:name="HTTP"/>
+        <apikit:router config-ref="user-config" doc:name="APIkit Router"/>
+        <exception-strategy ref="user-apiKitGlobalExceptionMapping" doc:name="Reference Exception Strategy"/>
+    </flow>
+
+    <flow name="put:/users:user-config">
+        <dw:transform-message doc:name="Transform Message" metadata:id="de1e5e15-3735-4060-9059-4e891882a18d">
+            <dw:input-payload doc:sample="C:\Users\Sinte Craft\Downloads\updateuser.json" mimeType="application/json"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/xml
+%namespace ns0 http://www.craftsoftware.com/users
+---
+{
+	ns0#UpdateUserRequest: {
+		ns0#User: {
+			ns0#id: payload.id,
+			ns0#fist: payload.first,
+			ns0#last: payload.last,
+			ns0#department: payload.department
+		}
+	}
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <ws:consumer config-ref="Web_Service_Consumer" operation="UpdateUser" doc:name="Web Service Consumer"/>
+        <set-payload value="successfully updated" doc:name="Set Payload"/>
+    </flow>
+    <flow name="delete:/users/{id}:user-config">
+        <set-variable variableName="id" value="#[message.inboundProperties.'http.uri.params'.id]" doc:name="Variable"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/xml
+%namespace ns0 http://www.craftsoftware.com/users
+---
+{
+	ns0#DeleteUserRequest: {
+		ns0#id: flowVars.id as :number
+	}
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <ws:consumer config-ref="Web_Service_Consumer" operation="DeleteUser" doc:name="Web Service Consumer"/>
+        <set-payload value="successfully deleted" doc:name="Set Payload"/>
+    </flow>
+    <flow name="get:/users:user-config">
+        <ws:consumer config-ref="Web_Service_Consumer" operation="GetAllUsers" doc:name="Web Service Consumer"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:input-payload doc:sample="sample_data\GetAllUsersResponse_1.xml"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json
+%namespace ns0 http://www.craftsoftware.com/users
+---
+payload.ns0#GetAllUsersResponse.*ns0#Users map ((user , indexOfUser) -> {
+	id: user.ns0#id,
+	first: user.ns0#fist,
+	last: user.ns0#last,
+	department: user.ns0#department
+})]]></dw:set-payload>
+        </dw:transform-message>
+
+    </flow>
+    <flow name="get:/users/{id}:user-config">
+        <set-payload value="#[NullPayload.getInstance()]" doc:name="Set Payload"/>
+        <set-variable variableName="id" value="#[message.inboundProperties.'http.uri.params'.id]" doc:name="Variable"/>
+        <logger level="INFO" doc:name="Logger"/>
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/xml
+%namespace ns0 http://www.craftsoftware.com/users
+---
+{
+	ns0#GetUserRequest: {
+		ns0#id: flowVars.id as :number
+	}
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <ws:consumer config-ref="Web_Service_Consumer" operation="GetUser" doc:name="Web Service Consumer"/>
+        <dw:transform-message doc:name="Transform Message" metadata:id="e6dd8bc6-58c9-431b-8e55-6a0cfb0ae00d">
+            <dw:input-payload doc:sample="sample_data\GetUserResponse_1.xml"/>
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/json 
+---
+
+
+ payload  mapObject ((item, index) -> {
+(
+"User " ++ (item.id)):
+ {
+  	'id':item.id , 
+  	'firstName':item.fist,
+  	'department':item.department  
+  } 
+   
+} )]]></dw:set-payload>
+        </dw:transform-message>
+    </flow>
+    <flow name="post:/users:user-config">
+        <dw:transform-message doc:name="Transform Message">
+            <dw:set-payload><![CDATA[%dw 1.0
+%output application/xml
+%namespace ns0 http://www.craftsoftware.com/users
+---
+{
+	ns0#CreateUserRequest: {
+		ns0#CreateUser: {
+			ns0#fist: payload.first,
+			ns0#last: payload.last,
+			ns0#department: payload.department
+		}
+	}
+}]]></dw:set-payload>
+        </dw:transform-message>
+        <ws:consumer config-ref="Web_Service_Consumer" operation="CreateUser" doc:name="Web Service Consumer"/>
+        <set-payload value="successfully saved" doc:name="Set Payload"/>
+    </flow>
+    <apikit:mapping-exception-strategy name="user-apiKitGlobalExceptionMapping">
+        <apikit:mapping statusCode="404">
+            <apikit:exception value="org.mule.module.apikit.exception.NotFoundException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Resource not found&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="405">
+            <apikit:exception value="org.mule.module.apikit.exception.MethodNotAllowedException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Method not allowed&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="415">
+            <apikit:exception value="org.mule.module.apikit.exception.UnsupportedMediaTypeException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Unsupported media type&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="406">
+            <apikit:exception value="org.mule.module.apikit.exception.NotAcceptableException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Not acceptable&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+        <apikit:mapping statusCode="400">
+            <apikit:exception value="org.mule.module.apikit.exception.BadRequestException" />
+            <set-property propertyName="Content-Type" value="application/json" doc:name="Property"/>
+            <set-payload value="{ &quot;message&quot;: &quot;Bad request&quot; }" doc:name="Set Payload"/>
+        </apikit:mapping>
+    </apikit:mapping-exception-strategy>
+</mule>
