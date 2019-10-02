@@ -187,11 +187,11 @@
 	
 	<!-- Mule Dependencies -->
 	<dependencies>
-		<!--<dependency>
+	 <dependency>
 			<groupId>com.mulesoft.muleesb</groupId>
 			<artifactId>mule-core-ee</artifactId>
 			<version>3.9.2</version>
-		</dependency>-->
+		</dependency> 
 		<!-- Xml configuration -->
 		<dependency>
 			<groupId>com.mulesoft.muleesb.modules</groupId>
@@ -278,7 +278,7 @@
 	<repositories>
         
 		<repository>
-            <id>Craft-releases</id>
+            <id>central</id>
             <name>Craft Releases Repository</name>
             <url>https://craftart1.jfrog.io/craftart1/libs-release/</url>
             <layout>default</layout>
