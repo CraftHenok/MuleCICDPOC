@@ -292,8 +292,8 @@
             <id>mulesoft-release</id>
             <name>mulesoft release repository</name>
             <layout>default</layout>
-            <url>https://craftart1.jfrog.io/craftart1/libs-release/</url>
-          <snapshots>
+			<url>http://repository.mulesoft.org/releases/</url>
+			<snapshots>
                 <enabled>false</enabled>
             </snapshots>
         </pluginRepository>
